@@ -25,14 +25,14 @@ public class Receita {
         Tabela = new Hashtable<String,Token>();
 
 
-        Tabela.put("grama", new Token("grama","un_medida"));
-        Tabela.put("xicara", new Token("xicara","un_medida"));
-        Tabela.put("colher", new Token("colher","un_medida"));
-        Tabela.put("pitada", new Token("pitada","un_medida"));
-        Tabela.put("dente", new Token("dente","un_medida"));
+        Tabela.put("gramas", new Token("gramas","un_medida"));
+        Tabela.put("xicaras", new Token("xicaras","un_medida"));
+        Tabela.put("colheres", new Token("colheres","un_medida"));
+        Tabela.put("pitadas", new Token("pitadas","un_medida"));
+        Tabela.put("dentes", new Token("dentes","un_medida"));
 
-        Tabela.put("ingredientes", new Token("ingredientes","ingredientes"));
-        Tabela.put("modo_de_preparo", new Token("modo_de_preparo","modo_de_preparo"));
+        Tabela.put("Ingredientes", new Token("Ingredientes","Ingredientes"));
+        Tabela.put("Modo_de_preparo", new Token("Modo_de_preparo","Modo_de_preparo"));
 
         prox = " ";
         token = analex();
@@ -102,103 +102,17 @@ public class Receita {
                 if ( w != null ) {
                     return w;
                 } else {
-                    w = new Token(s,"id");
+                    w = new Token(s,"palavra");
                     Tabela.put(s, w);
                     return w;
                 }
             }
             /* se atingiu este ponto, o caracter em prox é uma token */
-            if (prox.equals("=")) {
-                prox = proximo();
-                if (prox.equals("=")) {
-                    prox = " ";
-                    return new Token("==","==");
-                } else {
-                    return new Token("=","=");
-                }
-            } else if (prox.equals("!")) {
-                prox = proximo();
-                if (prox.equals("=")) {
-                    prox = " ";
-                    return new Token("!=","!=");
-                } else {
-                    return new Token("!","!");
-                }
-            } else if (prox.equals("<")) {
-                prox = proximo();
-                if (prox.equals("=")) {
-                    prox = " ";
-                    return new Token("<=","<=");
-                } else {
-                    return new Token("<","<");
-                }
-            } else if (prox.equals(">")) {
-                prox = proximo();
-                if (prox.equals("=")) {
-                    prox = " ";
-                    return new Token(">=",">=");
-                } else {
-                    return new Token(">",">");
-                }
-            } else if (prox.equals("+")) {
-                prox = proximo();
-                if (prox.equals("+")) {
-                    prox = " ";
-                    return new Token("++","++");
-                } else if (prox.equals("=")) {
-                    prox = " ";
-                    return new Token("+=","+=");
-                } else {
-                    return new Token("+","+");
-                }
-            } else if (prox.equals("-")) {
-                prox = proximo();
-                if (prox.equals("-")) {
-                    prox = " ";
-                    return new Token("--","--");
-                } else if (prox.equals("=")) {
-                    prox = " ";
-                    return new Token("-=","-=");
-                } else {
-                    return new Token("-","-");
-                }
-            } else if (prox.equals("*")) {
-                prox = proximo();
-                if (prox.equals("=")) {
-                    prox = " ";
-                    return new Token("*=","*=");
-                } else {
-                    return new Token("*","*");
-                }
-            } else if (prox.equals("/")) {
-                prox = proximo();
-                if (prox.equals("=")) {
-                    prox = " ";
-                    return new Token("/=","/=");
-                } else {
-                    return new Token("/","/");
-                }
-            } else if (prox.equals("&")) {
-                prox = proximo();
-                if (prox.equals("&")) {
-                    prox = " ";
-                    return new Token("&&","&&");
-                } else {
-                    return new Token("&","&");
-                }
-            } else if (prox.equals("|")) {
-                prox = proximo();
-                if (prox.equals("|")) {
-                    prox = " ";
-                    return new Token("||","||");
-                } else {
-                    return new Token("|","|");
-                }
-            } else { // identifica os demais simbolos como por exeplo chaves e colchetes
+
                 Token w = new Token(prox,prox);
                 prox = " "; /* initialization */
                 return w;
-            }
+
         } catch (NullPointerException e) {
             return new Token("fim","fim");
         }
@@ -207,11 +121,11 @@ public class Receita {
     public boolean programa() {
 
         if (!texto()) return Erro("titulo esperado!");
-        if (!match("ingredientes")) return Erro("'ingredientes' esperado!");
+        if (!match("Ingredientes")) return Erro("'ingredientes' esperado!");
         if (!match(":")) return Erro("':' esperado após ingredientes!");
 
         // enquanto não achar o modo de preparo continuar conferindo a lista
-        while(!match("modo_de_preparo")){
+        while(!match("Modo_de_preparo")){
 
             if (!lista_ing()) return Erro("erro na lista de ingredientes!");
 
@@ -233,9 +147,9 @@ public class Receita {
             if (!match("un_medida")) return Erro("unidade de medida errado!");
         }
 
-        if (!match("id")) return Erro("ingrediente esperado!");
 
-        if (!match(";")) return Erro("; esperado!");
+        if (!ingrediente()) return Erro("ingrediente esperado!");
+
 
         return true;
 
@@ -245,7 +159,17 @@ public class Receita {
 
         while(!match(".")){
 
-            if (!match("id")) return Erro("titulo da receita esperado!");
+            if (!match("palavra")) return Erro("Erro em alguma palavra ou letra");
+        }
+
+        return true;
+    }
+
+    public boolean ingrediente(){
+
+        while(!match(";")){
+
+            if (!match("palavra")) return Erro("Erro em alguma palavra ou letra");
         }
 
         return true;
