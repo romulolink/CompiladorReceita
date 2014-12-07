@@ -9,23 +9,37 @@ public class Receita {
     private String programa;
     private Token token;
     private String prox;
-    private String strExpr;
-    private Hashtable<String,Token> Tabela; //Tokens
     private int linha;
     private int pont;
+    private Hashtable<String,Token> Tabela; //Tokens
+    private String strExpr;
     private int endBase; //Base do endereçamento de variáveis;
+
+
 
 
     public Receita(String programa) {
         this.programa = programa;
+        pont = 0;
+        linha = 0;
         Tabela = new Hashtable<String,Token>();
+
+
+        Tabela.put("grama", new Token("grama","un_medida"));
+        Tabela.put("xicara", new Token("xicara","un_medida"));
+        Tabela.put("colher", new Token("colher","un_medida"));
+        Tabela.put("pitada", new Token("pitada","un_medida"));
+        Tabela.put("dente", new Token("dente","un_medida"));
+
+        Tabela.put("ingredientes", new Token("ingredientes","ingredientes"));
+        Tabela.put("modo_de_preparo", new Token("modo_de_preparo","modo_de_preparo"));
+
         prox = " ";
         token = analex();
-        pont = 0;
         endBase = 0;
 
         if (programa()){
-            System.out.println("Programa correto");
+            System.out.println("Receita correta");
         }
     }
 
@@ -191,13 +205,64 @@ public class Receita {
     }
 
     public boolean programa() {
-        if (!match("id")) return Erro("receita: esperado!");
+
+        if (!texto()) return Erro("titulo esperado!");
+        if (!match("ingredientes")) return Erro("'ingredientes' esperado!");
+        if (!match(":")) return Erro("':' esperado após ingredientes!");
+
+        // enquanto não achar o modo de preparo continuar conferindo a lista
+        while(!match("modo_de_preparo")){
+
+            if (!lista_ing()) return Erro("erro na lista de ingredientes!");
+
+        }
+
+        if (!match(":")) return Erro("':' esperado após modo de preparo!");
+
+
+        if(!lista_instrucoes()) return Erro("Esperada lista de instruçoes!");
         return true;
     }
 
-    public boolean bloco() {
+    public boolean lista_ing() {
+        if (!match("-")) return Erro("'-' esperado antes do item de ingrediente!");
+        if (!match("num")) return Erro("num esperado!");
+
+        // unidade de medida é opcional
+        if(token.igual("un_medida")) {
+            if (!match("un_medida")) return Erro("unidade de medida errado!");
+        }
+
+        if (!match("id")) return Erro("ingrediente esperado!");
+
+        if (!match(";")) return Erro("; esperado!");
+
+        return true;
+
+    }
+
+    public boolean texto(){
+
+        while(!match(".")){
+
+            if (!match("id")) return Erro("titulo da receita esperado!");
+        }
+
         return true;
     }
+
+
+    public boolean lista_instrucoes() {
+        if (!match("num")) return Erro("numero esperado!");
+        if (!match(")")) return Erro("')' esperado após o numero");
+
+        if (!texto()) return Erro("instrução esperada!");
+
+        return true;
+
+    }
+
+
 
 
     /* implementação dos diagramas hierárquicos */
